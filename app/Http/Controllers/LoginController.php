@@ -59,7 +59,7 @@ class LoginController extends Controller
             $data['token'] = $radomStr;
             $data['email'] = $user[0]->email;
             $data['title'] = 'Reset Password';
-            $data['description'] = 'Reset Password with This Link';
+            $data['description'] = 'This is email from E-learning System, You Can Reset Your Password with The Link Below';
             $data['url'] = $url;
 
             Mail::send('resetPasswordMail',['data'=>$data] , function ($message) use ($data) {

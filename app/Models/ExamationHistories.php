@@ -7,5 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ExamationHistories extends Model
 {
+    use  HasFactory;
     protected $guarded = [];
 }

@@ -21,6 +21,7 @@ Route::group(['prefix'=>'admin', 'namespace'=>'App\Http\Controllers'], function(
     Route::post('register', 'RegisterController@register');
     Route::post('login', 'LoginController@login');
     Route::post('logout', 'LoginController@logout');
+    Route::post('getUserByToken', 'UserAccountsController@getAccountByToken');
     Route::post('reset-password', 'LoginController@sentMailtoResetPassword');
     Route::post('reset-password-request', 'LoginController@sendTokenResetPassword');
 
@@ -29,6 +30,8 @@ Route::group(['prefix'=>'admin', 'namespace'=>'App\Http\Controllers'], function(
          Route::get('user-accounts', 'UserAccountsController@getAllUserAccounts');
          Route::get('user-accounts/get-account/{id}', 'UserAccountsController@getAccountByID');
          Route::post('user-accounts/handle-update', 'UserAccountsController@handleUpdateAccount');
+         Route::post('user-accounts/change-password', 'UserAccountsController@changePassword');
+
          Route::put('user-accounts/handle-disable/{id}', 'UserAccountsController@handlerDisableAccount');
          Route::put('user-accounts/handle-enable/{id}', 'UserAccountsController@handlerEnableAccount');
 
@@ -45,11 +48,17 @@ Route::group(['prefix'=>'admin', 'namespace'=>'App\Http\Controllers'], function(
          Route::get('get-all-subjects', 'SubjectsController@getAllSubjects');
          Route::post('create-subject', 'SubjectsController@createSubject');
          Route::get('get-edit-subject/{id}', 'SubjectsController@getEdit');
-         Route::delete('subject/delete/{id}', 'SubjectsController@handleDelete');
+         Route::post('handle-edit-subject', 'SubjectsController@handleEdit');
+         Route::put('disable-subject/{id}', 'SubjectsController@handleDisableSubject');
+         Route::put('enable-subject/{id}', 'SubjectsController@handleEnableSubject');
+
 
          //Examination Api
          Route::post('search-exame-by-subject', 'ExaminationController@getExamBySubject');
-         Route::get('get-all-exame', 'ExaminationController@getAllExam');
+         Route::get('get-all-exame', 'ExaminationController@getAllExamWithPagination');
+         Route::get('get-all-exam', 'ExaminationController@getAllExam');
+         Route::get('get-exam-by-Id/{id}', 'ExaminationController@getExambyId');
+
          Route::post('create-exame', 'ExaminationController@createExame');
          Route::post('get-edit-exame', 'ExaminationController@getEdit');
          Route::post('handlde-edit-exame', 'ExaminationController@handleEdit');
@@ -72,13 +81,16 @@ Route::group(['prefix'=>'admin', 'namespace'=>'App\Http\Controllers'], function(
          Route::get('get-all-questions', 'QuestionsController@getAllQuestions');
          Route::post('create-question', 'QuestionsController@createQuestion');
          Route::post('get-edit-question', 'QuestionsController@getQuestionByID');
-         Route::post('handlde-edit-question', 'QuestionsController@handleEdit');
+         Route::post('handlde-edit-question', 'QuestionsController@handleEditQuestion');
          Route::put('disable-question/{id}', 'QuestionsController@handleDisableQuestion');
          Route::put('enable-question/{id}', 'QuestionsController@handleEnableQuestion');
 
          //Add Question to Examination Api
-         Route::post('add-question-to-exame', 'QuestiontoExameController@addQuestionToExame');
-         Route::post('get-question-belongs-to-exame', 'QuestiontoExameController@getQuestionBelongsToExame');
+         Route::get('add-question-to-exame/{id}', 'QuestiontoExameController@addQuestionToExame');
+         Route::post('get-question-belongs-to-exame', 'QuestiontoExameController@getAllQuestionsByExam');
+         Route::post('save-question', 'QuestiontoExameController@saveAnwser');
+         Route::post('save-exam', 'QuestiontoExameController@saveExam');
+
 
     });
 

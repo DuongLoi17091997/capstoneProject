@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ExamationHistories;
+use App\Models\sessionTokenUser;
+use App\Models\Examination;
+use App\Models\Subjects;
+use App\Models\User;
+
 
 class ExaminationHistoryController extends Controller
 {
@@ -80,21 +85,23 @@ class ExaminationHistoryController extends Controller
         }
         return response()->json(['code'=> '400', 'msg'=> 'Id is invalid'], 400);
     }
-    public function getExameHistoryByUser(){
-        $header = apache_request_headers();
-        $token = $header['token'];
+    public function getExameHistoryByUser(Request $request){
+        $token = $request->token;
         $findToken = sessionTokenUser::where('token', $token)->first();
         if(!empty($findToken)){
-            $userId = $findToken->user_id;
+            $exameHistoryLst = ExamationHistories::where('user_id','=', $findToken->user_id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+            $examList = Examination::All();
+            $subject = Subjects::All();
+            if(!empty($exameHistoryLst)){
+                return response()->json(['code'=>'200','data'=>$exameHistoryLst, 'examList'=>$examList, 'subjectList'=>$subject], 200);
+            }
+            return response()->json(['code'=>'401','msg' => 'Invalid Token'], 401);
         }else{
-            return response()->json(['code' => '400', 'msg'=> 'Invalid Token'], 400);
+            return response()->json(['code'=>'401','msg' => 'Invalid Token'], 401);
         }
-        $exameHistoryLst = ExamationHistories::where('user_id','=', $userId)->get();
-        if(!empty($exameLst)){
-            return response()->json(['code'=> '200', 'data'=> $exameHistoryLst], 200);
-        }else{
-            return response()->json(['code'=> '400', 'msg'=> 'Id is invalid'], 400);
-        }
+        
     }
     public function getExamHistoryByExameId(){
         $header = apache_request_headers();

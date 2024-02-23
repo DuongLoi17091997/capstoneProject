@@ -8,12 +8,27 @@ use App\Models\Examination;
 
 class ExaminationController extends Controller
 {
-    public function getAllExam(){
-        $exams = Examination::All();
-        if(!$exams){
+    public function getAllExamWithPagination(){
+        $exams = Examination::paginate(16);
+        if(!empty($exams)){
             return response()->json(['code'=>'200','data' => $exams], 200);
         }
         return response()->json(['code'=>'400','msg' => 'None Exame is Available'], 400);
+    }
+    public function getAllExam(){
+        $exams = Examination::All();
+        if(!empty($exams)){
+            return response()->json(['code'=>'200','data' => $exams], 200);
+        }
+        return response()->json(['code'=>'400','msg' => 'None Exame is Available'], 400);
+    }
+    public function getExambyId($id){
+        $exam = Examination::where('id','=', $id)->first();
+        if(!empty($exam)){
+            return response()->json(['code'=> '200', 'data'=> $exam], 200);
+        }else{
+            return response()->json(['code'=> '400', 'msg'=> 'Id is invalid'], 400);
+        }
     }
     public function createExame(Request $request){
         $header = apache_request_headers();

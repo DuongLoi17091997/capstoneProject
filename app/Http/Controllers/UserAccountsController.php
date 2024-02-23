@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\sessionTokenUser;
+use App\Models\Questions;
+use Illuminate\Support\Facades\Auth;
+
+
 
 
 class UserAccountsController extends Controller
@@ -41,6 +46,20 @@ class UserAccountsController extends Controller
         }
         return response()->json(['code'=>'400','msg'=>'Invalid ID'], 400);
     }
+    public function getAccountByToken(Request $request){
+        $token = $request->token;
+        $findToken = sessionTokenUser::where('token', $token)->first();
+        if(!empty($findToken)){
+            $selectedAccount = User::where('id',$findToken->user_id)->first();
+            return response()->json(['code'=>'200','msg' =>'Get User Success', 'data' => $selectedAccount], 200);
+        }else{
+            return response()->json(['code'=>'401','msg' => 'Invalid Token'], 401);
+        }
+        if(!empty($selectedAccount)){
+            return response()->json(['code'=>'200','data'=>$selectedAccount], 200);
+        }
+        return response()->json(['code'=>'400','msg'=>'Invalid ID'], 400);
+    }
     public function handleUpdateAccount(Request $request){
         $selectedAccount = User::where('id',$request->id)->first();
         if(!empty($selectedAccount)){
@@ -57,5 +76,23 @@ class UserAccountsController extends Controller
             return response()->json(['code'=>'200','msg'=>'Update Success'], 200);
         }
         return response()->json(['code'=>'400','msg'=>'Invalid ID'], 400);
+    }
+    public function changePassword(Request $request){
+        $loginData = [
+            'email' => $request->email,
+            'password' => $request->currentPassword
+        ];
+        if(Auth::guard('web')->attempt($loginData)){
+            $foundUser = User::where('id', auth()->id())->first();
+            if(!empty($foundUser)){
+                $foundUser->password = bcrypt($request->newPassword);
+                $foundUser->save();
+                return response()->json(['code'=>'200', 'msg' => 'Change Password Successfully'], 200);
+            }else{
+                return response()->json(['code'=>'400','msg'=>'Invalid ID'], 400);
+            }
+        }else{
+            return response()->json(['code'=>'400','msg' => 'Current Password is incorrected'], 400);
+        }
     }
 }

@@ -42,9 +42,9 @@ class SubjectsController extends Controller
     public function handleEdit(Request $request){
         $findSubjet = Subjects::where('id', $request->subjectId)->first();
         if(!empty($findSubjet)){
-            $findSubjet-> name = $request->subjectName;
-            $findSubjet -> range = $request->subjectRange;
-            $findSubjet -> grades = $request->gradeId;
+            $findSubjet-> name = $request->name;
+            $findSubjet -> range = $request->range;
+            $findSubjet -> grades_id = $request->grades_id;
             $findSubjet-> save();
             return response()->json(['code'=> '200', 'msg'=> 'Updated Success'], 200);
         }
@@ -55,6 +55,24 @@ class SubjectsController extends Controller
         if(!empty($findSubjet)){
             $findSubjet-> delete();
             return response()->json(['code'=> '200', 'msg'=> 'Deleted Success'], 200);
+        }
+        return response()->json(['code'=> '400', 'msg'=> 'Id is invalid'], 400);
+    }
+    public function handleDisableSubject($id){
+        $findSubject = Subjects::where('id','=', $id)->first();
+        if(!empty($findSubject)){
+            $findSubject->status = 0;
+            $findSubject->save();
+            return response()->json(['code'=> '200', 'msg'=> 'Disable Success'], 200);
+        }
+        return response()->json(['code'=> '400', 'msg'=> 'Id is invalid'], 400);
+    }
+    public function handleEnableSubject($id){
+        $findSubject = Subjects::where('id','=', $id)->first();
+        if(!empty($findSubject)){
+            $findSubject->status = 1;
+            $findSubject->save();
+            return response()->json(['code'=> '200', 'msg'=> 'Enable Success'], 200);
         }
         return response()->json(['code'=> '400', 'msg'=> 'Id is invalid'], 400);
     }
