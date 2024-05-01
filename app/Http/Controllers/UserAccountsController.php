@@ -13,8 +13,14 @@ use Illuminate\Support\Facades\Auth;
 
 class UserAccountsController extends Controller
 {
-    public function getAllUserAccounts(){
-        $userList = User::All();
+    public function getAllUserAccounts(Request $request){
+        $paramValue = $request->input('accountType');
+        $userList = array();
+        if($paramValue == '1'){
+            $userList = User::where('type', 'normal')->get();
+        }else {
+            $userList = User::where('type', 'admin')->get();
+        }
         if(!empty($userList)){
             return response()->json(['code'=>'200','data'=> $userList], 200);
         }else{
