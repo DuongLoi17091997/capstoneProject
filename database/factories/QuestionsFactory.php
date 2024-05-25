@@ -26,7 +26,7 @@ class QuestionsFactory extends Factory
             'multiple_seletion_result' => fake()->text,
             'writing_result' => fake()->text,
             'subjects_id' => fake()->numberBetween(1, 50),
-            'status' => fake()->randomElement(['draft','done'])
+            'status' => '1'
         ];
     }
 }

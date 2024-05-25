@@ -13,10 +13,9 @@ use Illuminate\Support\Facades\Auth;
 
 class UserAccountsController extends Controller
 {
-    public function getAllUserAccounts(Request $request){
-        $paramValue = $request->input('accountType');
+    public function getAllUserAccounts($accountType){
         $userList = array();
-        if($paramValue == '1'){
+        if($accountType == 1){
             $userList = User::where('type', 'normal')->get();
         }else {
             $userList = User::where('type', 'admin')->get();
@@ -66,8 +65,8 @@ class UserAccountsController extends Controller
         }
         return response()->json(['code'=>'400','msg'=>'Invalid ID'], 400);
     }
-    public function handleUpdateAccount(Request $request){
-        $selectedAccount = User::where('id',$request->id)->first();
+    public function handleUpdateAccount(Request $request, $id){
+        $selectedAccount = User::where('id',$id)->first();
         if(!empty($selectedAccount)){
             $selectedAccount->first_Name = $request->first_Name;
             $selectedAccount->last_Name = $request->last_Name;

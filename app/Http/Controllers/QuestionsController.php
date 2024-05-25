@@ -9,18 +9,15 @@ use App\Models\Questions;
 class QuestionsController extends Controller
 {
     public function getAllQuestions(){
-        $questList = Questions::All();
-        $subjectList = Subjects::All();
+        $questList = Questions::orderBy('created_at', 'desc')->get();
         if(!empty($questList)){
-            return response()->json(['code'=>'200','data' => $questList, 'subjectData' => $subjectList], 200);
+            return response()->json(['code'=>'200','data' => $questList], 200);
         }else{
             return response()->json(['code'=>'400','msg' => 'None Question is Available'], 400);
         }
     }
-    public function getQuestionByID(){
-        $header = apache_request_headers();
-        $questionId = $header['id'];
-        $questionLst = Questions::where('id','=', $questionId)->first();
+    public function getQuestionByID($id){
+        $questionLst = Questions::where('id','=', $id)->first();
         if(!$questionLst){
             return response()->json(['code'=> '200', 'data'=> $questionLst], 200);
         }
@@ -36,14 +33,14 @@ class QuestionsController extends Controller
         return response()->json(['code'=> '400', 'msg'=> 'Name is invalid'], 400);
     }
     public function createQuestion(Request $request){
-        $questionTitle = $request->title;
+        $questionTitle = $request->titles;
         $questionType = $request->type;
         $subjectId = $request->subject_id;
         $newQuestion = Questions::create([
             'titles' => $questionTitle,
-            'type' => $questionType,
+            'question_type' => $questionType,
             'subjects_id' => $subjectId,
-            'status' => true
+            'status' => '1'
         ]);
         if($questionType == 'Multiple Choice'){
             $questionASelection = $request->a_selection;
@@ -76,7 +73,7 @@ class QuestionsController extends Controller
             $questionType = $request->type;
             $subjectId = $request->subject_id;
             $findQuestion -> titles = $questionTitle;
-            $findQuestion -> type = $questionType;
+            $findQuestion -> question_type = $questionType;
             $findQuestion -> subjects_id = $subjectId;
             if($questionType == 'Multiple Choice'){
                 $findQuestion -> a_seletion = $request->a_selection;

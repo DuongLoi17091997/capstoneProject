@@ -16,7 +16,7 @@ class RegisterController extends Controller
             'last_Name' => $request->last_Name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'type' => $request->type === "1" ? "admin" : "normal",
+            'type' => $request->type === 1 ? "admin" : "normal",
             ]);
             if(!empty($newUser)){
                 return response()->json(["code"=>"200","msg"=>"Register Successful"], 200);

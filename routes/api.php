@@ -27,9 +27,9 @@ Route::group(['prefix'=>'admin', 'namespace'=>'App\Http\Controllers'], function(
 
     Route::group(['prefix'=>'dashboard'], function(){
          //Users Api
-         Route::get('user-accounts', 'UserAccountsController@getAllUserAccounts');
+         Route::get('user-accounts/{accountType}', 'UserAccountsController@getAllUserAccounts');
          Route::get('user-accounts/get-account/{id}', 'UserAccountsController@getAccountByID');
-         Route::post('user-accounts/handle-update', 'UserAccountsController@handleUpdateAccount');
+         Route::put('user-accounts/handle-update/{id}', 'UserAccountsController@handleUpdateAccount');
          Route::post('user-accounts/change-password', 'UserAccountsController@changePassword');
 
          Route::put('user-accounts/handle-disable/{id}', 'UserAccountsController@handlerDisableAccount');
@@ -80,8 +80,8 @@ Route::group(['prefix'=>'admin', 'namespace'=>'App\Http\Controllers'], function(
          Route::post('search-question-by-subjectId', 'QuestionsController@getQuestionBySubjectId');
          Route::get('get-all-questions', 'QuestionsController@getAllQuestions');
          Route::post('create-question', 'QuestionsController@createQuestion');
-         Route::post('get-edit-question', 'QuestionsController@getQuestionByID');
-         Route::post('handlde-edit-question', 'QuestionsController@handleEditQuestion');
+         Route::post('get-question/{id}', 'QuestionsController@getQuestionByID');
+         Route::put('edit-question/{id}', 'QuestionsController@handleEditQuestion');
          Route::put('disable-question/{id}', 'QuestionsController@handleDisableQuestion');
          Route::put('enable-question/{id}', 'QuestionsController@handleEnableQuestion');
 
