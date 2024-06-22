@@ -12,13 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('session_token_users', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('token');
             $table->string('refresh_token');
             $table->string('token_expired');
             $table->string('refresh_token_expired');
-            $table->bigInteger('user_id');
+            $table->uuid('user_Id')->nullable(false);
             $table->timestamps();
+            $table->foreign('user_Id')->references('id')->on('users');
         });
     }
 

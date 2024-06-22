@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('session_token_reset_passwords', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('token_reset_password');
             $table->string('email_reset_password');
             $table->timestamps();

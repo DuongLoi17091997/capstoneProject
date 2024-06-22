@@ -7,6 +7,7 @@ use App\Models\Examination;
 use App\Models\Questions;
 use App\Models\QuestiontoExame;
 use App\Models\Subjects;
+use Illuminate\Support\Str;
 use App\Models\ExamationHistories;
 use App\Models\sessionTokenUser;
 use function PHPUnit\Framework\isEmpty;
@@ -14,6 +15,7 @@ use function PHPUnit\Framework\isEmpty;
 class QuestiontoExameController extends Controller
 {
     public function addQuestionToExame($id){
+        $uuid = Str::uuid()->toString();
         $exameId = $id;
         $exam = Examination::where('id', $exameId)->first();
         $subject =  Subjects::where('id','=', $exam->subjects_id)->first();
@@ -24,6 +26,7 @@ class QuestiontoExameController extends Controller
             if(count($listAvailableExam) == 0){
                 foreach($listQuestions as $question){
                     $new = QuestiontoExame::create([
+                        'id' => $uuid,
                         'examination_id' => $exameId,
                         'questions_id' => $question->id
                     ]);
@@ -75,6 +78,7 @@ class QuestiontoExameController extends Controller
        
     }
     public function saveExam (Request $request){
+        $uuid = Str::uuid()->toString();
         $FoundRecord = QuestiontoExame::where('examination_id','=', $request->recordId)->get();
         $exam = Examination::where('id', $request->recordId)->first();
         $subject =  Subjects::where('id','=', $exam->subjects_id)->first();
@@ -94,6 +98,7 @@ class QuestiontoExameController extends Controller
             }
             $socre = ($countCorrectedQuestions/count($listQuestions)) * 100;
             $new = ExamationHistories::create([
+                'id' => $uuid,
                 'user_id' => $user->user_id,
                 'result' => $socre>= 50 ? 'passed' : 'failed',
                 'comments' => 'Comments',

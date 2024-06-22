@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Grades;
 use App\Models\Subjects;
+use Illuminate\Support\Str;
 
 
 class SubjectsController extends Controller
@@ -14,10 +15,12 @@ class SubjectsController extends Controller
         return response()->json($subjectLst, 200);
     }
     public function createSubject(Request $request){
+        $uuid = Str::uuid()->toString();
         $newSubject = Subjects::create([
+            'id' => $uuid,
             'name' => $request->name,
-            'range' => $request->range,
-            'grades_id' => $request->grades_id,
+            'description' => $request->description,
+            'grade_id' => $request->grade_id,
         ]);
         if(!empty($newSubject)){
             return response()->json(['code' => '200', 'msg'=> 'New Subject has been added'], 200);
@@ -39,12 +42,12 @@ class SubjectsController extends Controller
         }
         return response()->json(['code'=> '400', 'msg'=> 'Id is invalid'], 400);
     }
-    public function handleEdit(Request $request){
-        $findSubjet = Subjects::where('id', $request->subjectId)->first();
+    public function handleEdit(Request $request, $id){
+        $findSubjet = Subjects::where('id', $id)->first();
         if(!empty($findSubjet)){
             $findSubjet-> name = $request->name;
-            $findSubjet -> range = $request->range;
-            $findSubjet -> grades_id = $request->grades_id;
+            $findSubjet -> description = $request->description;
+            $findSubjet -> grade_id = $request->grade_id;
             $findSubjet-> save();
             return response()->json(['code'=> '200', 'msg'=> 'Updated Success'], 200);
         }

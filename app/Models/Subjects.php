@@ -12,11 +12,14 @@ class Subjects extends Model
     use  HasFactory;
     protected $appends = ['grade'];
     protected $guarded = [];
+    protected $casts = [
+        'id' => 'string'
+    ];
 
     // Define accessor for the additional field
     public function getGradeAttribute()
     {
-        $grade = Grades::where('id', $this->grades_id)->first();
+        $grade = Grades::where('id', $this->grade_id)->first();
         return $grade->grade;
     }
 }

@@ -8,5 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Grades extends Model
 {
     protected $guarded = [];
+    protected $casts = [
+        'id' => 'string'
+    ];
 }
 

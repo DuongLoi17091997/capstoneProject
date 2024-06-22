@@ -21,15 +21,18 @@ Route::group(['prefix'=>'admin', 'namespace'=>'App\Http\Controllers'], function(
     Route::post('register', 'RegisterController@register');
     Route::post('login', 'LoginController@login');
     Route::post('logout', 'LoginController@logout');
-    Route::post('getUserByToken', 'UserAccountsController@getAccountByToken');
+    Route::get('getUserByToken/{token}', 'UserAccountsController@getAccountByToken');
     Route::post('reset-password', 'LoginController@sentMailtoResetPassword');
     Route::post('reset-password-request', 'LoginController@sendTokenResetPassword');
 
     Route::group(['prefix'=>'dashboard'], function(){
          //Users Api
          Route::get('user-accounts/{accountType}', 'UserAccountsController@getAllUserAccounts');
+         Route::get('get-teachers', 'UserAccountsController@GetAllTeachers');
          Route::get('user-accounts/get-account/{id}', 'UserAccountsController@getAccountByID');
          Route::put('user-accounts/handle-update/{id}', 'UserAccountsController@handleUpdateAccount');
+         Route::post('user-accounts/update-avatar', 'UserAccountsController@handleUpdateAvatar');
+
          Route::post('user-accounts/change-password', 'UserAccountsController@changePassword');
 
          Route::put('user-accounts/handle-disable/{id}', 'UserAccountsController@handlerDisableAccount');
@@ -37,9 +40,9 @@ Route::group(['prefix'=>'admin', 'namespace'=>'App\Http\Controllers'], function(
 
          //Grades Api
          Route::get('grades', 'GradesController@getAllgrades');
-         Route::post('get-grade-by-id', 'GradesController@getGradeById');
+         Route::get('get-grade-by-id/{id}', 'GradesController@getGradeById');
          Route::post('create-grade', 'GradesController@createGrade');
-         Route::post('handle-edit-grade', 'GradesController@handleEdit');
+         Route::put('handle-edit-grade/{id}', 'GradesController@handleEdit');
          Route::put('disable-grade/{id}', 'GradesController@handleDisableGrade');
          Route::put('enable-grade/{id}', 'GradesController@handleEnableGrade');
 
@@ -47,8 +50,8 @@ Route::group(['prefix'=>'admin', 'namespace'=>'App\Http\Controllers'], function(
          Route::post('search-subject-by-class', 'SubjectsController@getSubjectByClass');
          Route::get('get-all-subjects', 'SubjectsController@getAllSubjects');
          Route::post('create-subject', 'SubjectsController@createSubject');
-         Route::get('get-edit-subject/{id}', 'SubjectsController@getEdit');
-         Route::post('handle-edit-subject', 'SubjectsController@handleEdit');
+         Route::get('get-subject-by-id/{id}', 'SubjectsController@getEdit');
+         Route::put('handle-edit-subject/{id}', 'SubjectsController@handleEdit');
          Route::put('disable-subject/{id}', 'SubjectsController@handleDisableSubject');
          Route::put('enable-subject/{id}', 'SubjectsController@handleEnableSubject');
 
@@ -66,8 +69,13 @@ Route::group(['prefix'=>'admin', 'namespace'=>'App\Http\Controllers'], function(
          Route::put('enable-exame/{id}', 'ExaminationController@handleEnableExame');
 
          //Examination History Api
-         Route::post('search-exame-history-by-exame-code', 'ExaminationHistoryController@getExamHistoryByExameId');
-         Route::post('search-exame-history-by-user', 'ExaminationHistoryController@getExameHistoryByUser');
+         Route::get('search-exame-history-by-exame-code/{id}', 'ExaminationHistoryController@getExamHistoryByExamId');
+         Route::put('update-exam-history-result/{id}', 'ExaminationHistoryController@updateExamHistoryResultById');
+         Route::put('add-comments-history-result/{id}', 'ExaminationHistoryController@addComments');
+
+         Route::post('create-exam-history', 'ExaminationHistoryController@createExamHistory');
+
+         Route::get('search-exame-history-by-user/{token}', 'ExaminationHistoryController@getExameHistoryByUser');
          Route::get('get-all-exame-histroy', 'ExaminationHistoryController@getAllExameHistory');
          Route::post('create-exame-history', 'ExaminationHistoryController@createExameHistory');
          Route::post('get-edit-exame-history', 'ExaminationHistoryController@getEdit');
@@ -80,10 +88,16 @@ Route::group(['prefix'=>'admin', 'namespace'=>'App\Http\Controllers'], function(
          Route::post('search-question-by-subjectId', 'QuestionsController@getQuestionBySubjectId');
          Route::get('get-all-questions', 'QuestionsController@getAllQuestions');
          Route::post('create-question', 'QuestionsController@createQuestion');
-         Route::post('get-question/{id}', 'QuestionsController@getQuestionByID');
+         Route::get('get-question/{id}', 'QuestionsController@getQuestionByID');
          Route::put('edit-question/{id}', 'QuestionsController@handleEditQuestion');
          Route::put('disable-question/{id}', 'QuestionsController@handleDisableQuestion');
          Route::put('enable-question/{id}', 'QuestionsController@handleEnableQuestion');
+
+         //Anwser Api
+         Route::post('save-anwser', 'QuestionAnswerController@saveAnwser');
+         Route::get('get-anwser/{id}', 'QuestionAnswerController@getAnwserById');
+         Route::put('edit-question-awnser/{id}', 'QuestionAnswerController@handleEditAwnserById');
+
 
          //Add Question to Examination Api
          Route::get('add-question-to-exame/{id}', 'QuestiontoExameController@addQuestionToExame');
@@ -91,6 +105,10 @@ Route::group(['prefix'=>'admin', 'namespace'=>'App\Http\Controllers'], function(
          Route::post('save-question', 'QuestiontoExameController@saveAnwser');
          Route::post('save-exam', 'QuestiontoExameController@saveExam');
 
+
+         //Api Assign Exam to Teacher
+         Route::get('get-list-assign-exam/{id}', 'AssignedExamTeacherController@getAssignExamByTeacherId');
+         Route::post('assign-exam', 'AssignedExamTeacherController@assignExamtoTeacher');
 
     });
 

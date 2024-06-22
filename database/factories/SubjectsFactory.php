@@ -18,7 +18,6 @@ class SubjectsFactory extends Factory
     {
         return [
             'name' => fake()->randomElement(['Math', 'English','Biology','Chemistry','Computer science','Algebra','Geometry','Literature','History','Geography']),
-            'range' => fake()->randomElement(['Easy', 'Normal','Hard','Challenging']),
             'grades_id' => fake()->randomElement([1,2,3,4,5,6,7,8,9,10,11,12])
         ];
     }

@@ -8,6 +8,11 @@ use App\Models\sessionTokenUser;
 use App\Models\Examination;
 use App\Models\Subjects;
 use App\Models\User;
+use Illuminate\Support\Str;
+use App\Models\QuestionAnswer;
+use Illuminate\Support\Arr;
+use Carbon\Carbon;
+
 
 
 class ExaminationHistoryController extends Controller
@@ -19,7 +24,53 @@ class ExaminationHistoryController extends Controller
         }
         return response()->json(['code'=>'400','msg' => 'None Exame is Available'], 400);
     }
+    public function getExamHistoryByExamId($id){
+        $examsHistory = ExamationHistories::where('id','=', $id)->first();
+        if(!empty($examsHistory)){
+            return response()->json(['code'=>'200','data' => $examsHistory], 200);
+        }
+        return response()->json(['code'=>'400','msg' => 'None Exame is Available'], 400);    
+    }
+    public function createExamHistory(Request $request){
+        $uuid = Str::uuid()->toString();
+        $newHistory = ExamationHistories::create([
+            'id' => $uuid,
+            'user_id' => $request->user_id,
+            'exam_id' => $request->exam_id,
+        ]);
+        foreach($newHistory->exam->childrens as $question){
+            $newAnwser = QuestionAnswer::create([
+                'id' => Str::uuid()->toString(),
+                'user_id' => $request->user_id,
+                'exam_id' => $uuid,
+                'question_id' => $question->id,
+            ]);
+        }
+    }
+    public function updateExamHistoryResultById(Request $request, $id){
+        $examsHistory = ExamationHistories::where('id','=', $id)->first();
+        $datetime = Carbon::now();
+        if(empty($examsHistory)){
+            return response()->json(['code'=>'400','msg' => 'None Exame is Available'], 400);
+        }
+        $listQuestionAwnser = $examsHistory->childrens;
+        $totalScore = 0;
+        foreach($listQuestionAwnser as $awnser){
+            if($awnser->isPassed){
+                $totalScore += 10;
+            }
+        }
+        $examsHistory->score = $totalScore;
+        $examsHistory->result = $totalScore > 50 ? "Passed" : "Failed";
+        $examsHistory->comments = $request->comment;
+        $examsHistory->time_for_completed =  $datetime->diffInMinutes($examsHistory->created_at);
+        $examsHistory->save();
+        return response()->json(['code'=>'200','msg' => 'Save Exam Successfully'], 200);
+    }
+  
     public function createExameHistory(Request $request){
+        $uuid = Str::uuid()->toString();
+
         $header = apache_request_headers();
         $token = $header['token'];
         $findToken = sessionTokenUser::where('token', $token)->first();
@@ -34,6 +85,7 @@ class ExaminationHistoryController extends Controller
         $exameCompletedTime = $header['exame_completed_time'];
         $exameId = $header['exame_id'];
         $newExameHistory = ExamationHistories::create([
+            'id' => $uuid,
             'score' => $exameSocre,
             'ressult' => $exameResult,
             'comments' => $exameComments,
@@ -48,54 +100,23 @@ class ExaminationHistoryController extends Controller
         }
 
     }
-    public function getEdit(){
-        $header = apache_request_headers();
-        $exameHistoryId = $header['id'];
-        $exameHistoryLst = ExamationHistories::where('id','=', $exameHistoryId)->first();
-        if(!$exameHistoryLst){
-            return response()->json(['code'=> '200', 'data'=> $exameHistoryLst], 200);
+    public function addComments(Request $request, $id){
+        $examsHistory = ExamationHistories::where('id','=', $id)->first();
+        if(!empty($examsHistory)){
+            $examsHistory->comments = $request->comment;
+            $examsHistory->save();
+            return response()->json(['code'=>'200','msg' => 'Send Comments Successfully'], 200);
         }
-        return response()->json(['code'=> '400', 'msg'=> 'Id is invalid'], 400);
+        return response()->json(['code'=>'401','msg' => 'Invalid Token'], 401);
     }
-    public function handleEdit(){
-        $header = apache_request_headers();
-        $token = $header['token'];
+    public function getExameHistoryByUser($token){
         $findToken = sessionTokenUser::where('token', $token)->first();
         if(!empty($findToken)){
-            $userId = $findToken->user_id;
-        }else{
-            return response()->json(['code' => '400', 'msg'=> 'Invalid Token'], 400);
-        }
-        $exameSocre = $header['exame_socre'];
-        $exameResult = $header['exame_result'];
-        $exameComment = $header['exame_comment'];
-        $exameCompletedTime = $header['exame_completed_time'];
-        $exameId = $header['exame_id'];
-        $exameHistoryId = $header['exame_history_id'];
-        $findExameHistory = ExamationHistories::where('id', $exameHistoryId)->first();
-        if(!empty($findExame)){
-            $findExameHistory-> score = $exameSocre;
-            $findExameHistory -> ressult = $exameResult;
-            $findExameHistory -> comments = $exameComment;
-            $findExameHistory -> time_for_completed = $exameCompletedTime;
-            $findExameHistory -> user_id = $userId;
-            $findExameHistory -> examination_id = $exameId;
-            $findExameHistory-> save();
-            return response()->json(['code'=> '200', 'msg'=> 'Updated Success'], 200);
-        }
-        return response()->json(['code'=> '400', 'msg'=> 'Id is invalid'], 400);
-    }
-    public function getExameHistoryByUser(Request $request){
-        $token = $request->token;
-        $findToken = sessionTokenUser::where('token', $token)->first();
-        if(!empty($findToken)){
-            $exameHistoryLst = ExamationHistories::where('user_id','=', $findToken->user_id)
+            $exameHistoryLst = ExamationHistories::where('user_id','=', $findToken->user_Id)
             ->orderBy('created_at', 'desc')
             ->get();
-            $examList = Examination::All();
-            $subject = Subjects::All();
             if(!empty($exameHistoryLst)){
-                return response()->json(['code'=>'200','data'=>$exameHistoryLst, 'examList'=>$examList, 'subjectList'=>$subject], 200);
+                return response()->json(['code'=>'200','data'=>$exameHistoryLst], 200);
             }
             return response()->json(['code'=>'401','msg' => 'Invalid Token'], 401);
         }else{

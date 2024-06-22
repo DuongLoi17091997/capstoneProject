@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('first_Name');
             $table->string('last_Name');
             $table->string('email')->unique();
@@ -22,11 +22,13 @@ return new class extends Migration
             $table->string('type')->default('normal');
             $table->string('phone')->nullable()->unique();
             $table->string('address')->nullable();
+            $table->string('ward')->nullable();
             $table->string('province')->nullable();
             $table->string('country')->nullable();
             $table->string('hobby')->nullable();
             $table->string('avatar')->nullable();
             $table->date('birthdate')->nullable();
+            $table->string('account_type')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
@@ -37,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        // Schema::dropIfExists('users');
     }
 };

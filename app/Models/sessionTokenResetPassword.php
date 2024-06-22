@@ -8,4 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class sessionTokenResetPassword extends Model
 {
     protected $guarded = [];
+    protected $casts = [
+        'id' => 'string'
+    ];
 }

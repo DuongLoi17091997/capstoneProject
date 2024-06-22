@@ -18,9 +18,11 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => Str::uuid()->toString(),
             'first_Name' => fake()->firstname(),
             'last_Name' => fake()->lastname(),
             'email' => fake()->unique()->safeEmail(),
+            'type' => fake()->randomElement(["admin", "normal"]),
             'password' => '123', // password
         ];
     }

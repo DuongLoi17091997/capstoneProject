@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('examinations', function (Blueprint $table) {
-            $table->string('dificulty')->nullable();
+            $table->uuid('author')->change()->nullable(false);
+            $table->foreign('author')->references('id')->on('users');
+
         });
     }
 

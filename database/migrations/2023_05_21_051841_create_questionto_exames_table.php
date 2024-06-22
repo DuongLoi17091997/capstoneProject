@@ -14,9 +14,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('questionto_exames', function (Blueprint $table) {
-            $table->id();
-            $table->foreignIdFor(Examination::class);
-            $table->foreignIdFor(Questions::class);
+            $table->uuid('id')->primary();
+            $table->uuid('exam_id')->nullable(false);
+            $table->foreign('exam_id')->references('id')->on('examinations');
+            $table->uuid('question_id')->nullable(false);
+            $table->foreign('question_id')->references('id')->on('questions');
             $table->timestamps();
         });
     }

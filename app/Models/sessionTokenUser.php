@@ -8,4 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class sessionTokenUser extends Model
 {
     protected $guarded = [];
+    protected $casts = [
+        'id' => 'string'
+    ];
 }

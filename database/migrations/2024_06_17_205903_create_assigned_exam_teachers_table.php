@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('grades', function (Blueprint $table) {
+        Schema::create('assigned_exam_teachers', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('grade');
-            $table->boolean('status');
+            $table->uuid('user_id');
+            $table->uuid('exam_id');
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('exam_id')->references('id')->on('examinations');
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('grades');
+        Schema::dropIfExists('assigned_exam_teachers');
     }
 };

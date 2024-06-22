@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('questionto_exames', function (Blueprint $table) {
-            $table->string('answer')->nullable();
-            $table->string('status')->nullable();
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('district')->nullable();
         });
     }
 
@@ -22,9 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('questionto_exames`', function (Blueprint $table) {
-            $table->dropColumn('answer');
-            $table->dropColumn('status');
-        });
+        //
     }
 };

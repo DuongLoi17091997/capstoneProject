@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Subjects;
 use App\Models\Questions;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+
 
 class QuestionsController extends Controller
 {
@@ -18,7 +22,7 @@ class QuestionsController extends Controller
     }
     public function getQuestionByID($id){
         $questionLst = Questions::where('id','=', $id)->first();
-        if(!$questionLst){
+        if(!empty($questionLst)){
             return response()->json(['code'=> '200', 'data'=> $questionLst], 200);
         }
         return response()->json(['code'=> '400', 'msg'=> 'Id is invalid'], 400);
@@ -33,57 +37,78 @@ class QuestionsController extends Controller
         return response()->json(['code'=> '400', 'msg'=> 'Name is invalid'], 400);
     }
     public function createQuestion(Request $request){
+        $uuid = Str::uuid()->toString();
+        $newFileName = '';
+        if ($request->file('file')) {
+            $file = $request->file('file');
+            $fileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $path = public_path('images/');
+
+            // Check if the file exists and rename if necessary
+            $counter = 1;
+            $newFileName = $fileName . '.' . $extension;
+            while (File::exists($path . $newFileName)) {
+                $newFileName = $fileName . '(' . $counter . ').' . $extension;
+                $counter++;
+            }
+            // Store the file
+            $file->move($path, $newFileName);
+
+        }
+
         $questionTitle = $request->titles;
-        $questionType = $request->type;
+        $questionType = $request->question_type;
         $subjectId = $request->subject_id;
+        $difficulty = $request->difficulty;
         $newQuestion = Questions::create([
+            'id' => $uuid,
             'titles' => $questionTitle,
             'question_type' => $questionType,
-            'subjects_id' => $subjectId,
-            'status' => '1'
+            'subject_id' => $subjectId,
+            'status' => '1',
+            'difficulty' => $difficulty,
+            'image' => $newFileName,
         ]);
-        if($questionType == 'Multiple Choice'){
+        $createdQuestion = Questions::where('id','=', $uuid)->first();
+        if($questionType == 'Multiple Choice' || $request->question_type == 'Single Choice'){
             $questionASelection = $request->a_selection;
             $questionBSelection = $request->b_selection;
             $questionCSelection = $request->c_selection;
             $questionDSelection = $request->d_selection;
-            $multipleChoiceReult = $request->multiple_choice_result;
-            $newQuestion -> a_seletion = $questionASelection;
-            $newQuestion -> b_seletion = $questionBSelection;
-            $newQuestion -> c_seletion = $questionCSelection;
-            $newQuestion -> d_seletion = $questionDSelection;
-            $newQuestion -> multiple_seletion_result = $multipleChoiceReult;
-            $newQuestion -> writing_result = '';
+            $multipleChoiceReult = $request->multiple_selection_result;
+            $createdQuestion -> a_selection = $questionASelection;
+            $createdQuestion -> b_selection = $questionBSelection;
+            $createdQuestion -> c_selection = $questionCSelection;
+            $createdQuestion -> d_selection = $questionDSelection;
+            $createdQuestion -> multiple_selection_result = $multipleChoiceReult;
+            $createdQuestion -> writing_result = '';
         }else{
             $writingResult = $request->writing_result;
-            $newQuestion -> writing_result = $writingResult;
+            $createdQuestion -> writing_result = $writingResult;
         }
-        $newQuestion->save();
-        if(!empty($newQuestion)){
+        $createdQuestion->save();
+        if(!empty($createdQuestion)){
             return response()->json(['code' => '200', 'msg'=> 'New Question has been added'], 200);
         }else{
             return response()->json(['code' => '400', 'msg'=> 'Create new Question Faild'], 400);
         }
     }
-    public function handleEditQuestion(Request $request){
-        $questionId = $request->question_id;
-        $findQuestion = Questions::where('id','=', $questionId)->first();
+    public function handleEditQuestion(Request $request, $id){
+        $findQuestion = Questions::where('id','=', $id)->first();
         if(!empty($findQuestion)){
-            $questionTitle = $request->title;
-            $questionType = $request->type;
-            $subjectId = $request->subject_id;
-            $findQuestion -> titles = $questionTitle;
-            $findQuestion -> question_type = $questionType;
-            $findQuestion -> subjects_id = $subjectId;
-            if($questionType == 'Multiple Choice'){
-                $findQuestion -> a_seletion = $request->a_selection;
-                $findQuestion -> b_seletion = $request->b_selection;
-                $findQuestion -> c_seletion = $request->c_selection;
-                $findQuestion -> d_seletion = $request->c_selection;
-                $findQuestion -> multiple_seletion_result = $request->multiple_choice_result;
+            $findQuestion -> titles = $request->titles;
+            $findQuestion -> question_type = $request->question_type;
+            $findQuestion -> subject_id = $request->subject_id;
+            if($request->question_type == 'Multiple Choice' || $request->question_type == 'Single Choice'){
+                $findQuestion -> a_selection = $request->a_selection;
+                $findQuestion -> b_selection = $request->b_selection;
+                $findQuestion -> c_selection = $request->c_selection;
+                $findQuestion -> d_selection = $request->c_selection;
+                $findQuestion -> multiple_selection_result = $request->multiple_selection_result;
                 $findQuestion -> writing_result = '';
             }else{
-                $findQuestion -> writing_result = $request->writting_result;
+                $findQuestion -> writing_result = $request->writing_result;
             }
             $findQuestion -> save();
             return response()->json(['code'=> '200', 'msg'=> 'Updated Question Success'], 200);

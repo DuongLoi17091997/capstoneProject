@@ -12,9 +12,11 @@ use Mail;
 use URL;
 use Carbon\Carbon;
 
+
 class LoginController extends Controller
 {
     public function login(Request $request){
+        $uuid = Str::uuid()->toString();
         $loginData = [
             'email' => $request->email,
             'password' => $request->password
@@ -23,6 +25,7 @@ class LoginController extends Controller
             $isTokenExits = sessionTokenUSer::where('user_id', auth()->id())->first();
             if(empty($isTokenExits)){
                 $userToken = sessionTokenUser::create([
+                    'id' => $uuid,
                     'token' => Str::random(40),
                     'refresh_token' => Str::random(40),
                     'token_expired' => date('Y-m-d H:i:s', strtotime('+1 day')),

@@ -10,17 +10,17 @@ use App\Models\Subjects;
 class Questions extends Model
 {
     use  HasFactory;
-    protected $appends = ['difficulty'];
+    protected $appends = ['subject_name'];
     protected $guarded = [];
+    protected $casts = [
+        'id' => 'string'
+    ];
 
-    // Define accessor for the additional field
-    public function getDifficultyAttribute()
+    public function getSubjectNameAttribute()
     {
-        $subjectList = Subjects::where('id', $this->subjects_id)->first();
-        return $subjectList->range;
+        $subjectList = Subjects::where('id', $this->subject_id)->first();
+        $subjectName = $subjectList->name . " ". $subjectList->grade;
+        return $subjectName;
     }
     
-    public function setDifficultyFieldAttribute($value){
-        $this->attributes['difficulty'] = (string) $value;
-    }
 }

@@ -13,11 +13,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('subjects', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('name');
-            $table->string('range');
-            $table->foreignIdFor(Grades::class);
+            $table->uuid('grade_id')->nullable(false);
+            $table->boolean('status')->default(true);
             $table->timestamps();
+
+            $table->foreign('grade_id')->references('id')->on('grades');
         });
 
     }

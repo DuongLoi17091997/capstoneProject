@@ -13,18 +13,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('questions', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->longText('titles');
-            $table->string('type');
-            $table->string('a_seletion');
-            $table->string('b_seletion');
-            $table->string('c_seletion');
-            $table->string('d_seletion');
-            $table->string('multiple_seletion_result');
+            $table->string('question_type');
+            $table->string('difficulty');
+            $table->string('a_selection');
+            $table->string('b_selection');
+            $table->string('c_selection');
+            $table->string('d_selection');
+            $table->string('multiple_selection_result');
             $table->longText('writing_result');
             $table->string('status');
-            $table->foreignIdFor(Subjects::class);
+            $table->uuid('subject_id')->nullable(false);
+            $table->foreign('subject_id')->references('id')->on('subjects');
             $table->timestamps();
+        });
+        Schema::table('examation_histories', function (Blueprint $table) {
+            $table->uuid('exam_id')->nullable(false);
+            $table->foreign('exam_id')->references('id')->on('examinations');
         });
     }
 
